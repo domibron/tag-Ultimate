@@ -61,7 +61,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
     void Start()
     {
 
-        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
         //Debug.Log("Connecting to Lobby");
