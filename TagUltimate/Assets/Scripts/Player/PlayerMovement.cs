@@ -156,7 +156,9 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 
 	public void Expload(float force, Vector3 pos, float range)
 	{
-		PV.RPC(nameof(AddExploForce), RpcTarget.All, force, pos, range);
+		PV.RPC(nameof(AddExploForce), RpcTarget.Others, force, pos, range);
+
+		Die();
 	}
 
 	[PunRPC]
