@@ -73,10 +73,15 @@ public class SeekerExplosion : MonoBehaviour
 				}
 
 
+				collider.GetComponent<PlayerMovement>().AddForce((collider.transform.position - transform.position) * ExplosionForce, ForceMode.VelocityChange);
+
 				//collider.GetComponent<Rigidbody>()?.AddExplosionForce(ExplosionForce, transform.position, MaxRange * RageMultForExplosion);
 			}
 
-			GetComponent<PlayerMovement>().Expload(ExplosionForce, transform.position, MaxRange * RageMultForExplosion);
+			//GetComponent<PlayerMovement>().Expload(ExplosionForce, transform.position, MaxRange * RageMultForExplosion);
+
+			GetComponent<PlayerMovement>().Die();
+
 
 		}
 
