@@ -74,6 +74,8 @@ public class SeekerExplosion : MonoBehaviour
 
 				collider.attachedRigidbody.AddExplosionForce(ExplosionForce, transform.position, MaxRange);
 			}
+
+			GetComponent<PlayerMovement>().Die();
 		}
 
 		if (Input.GetKeyDown(KeyCode.E))

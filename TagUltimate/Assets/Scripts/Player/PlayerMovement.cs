@@ -149,7 +149,7 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 		}
 	}
 
-	void Die() // function to call to kill player
+	public void Die() // function to call to kill player
 	{
 		PlayerManagerForPlayer.Die();
 	}
