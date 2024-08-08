@@ -1,6 +1,7 @@
+using Photon.Pun;
 using UnityEngine;
 
-public class FirstPersonCamera : MonoBehaviour
+public class FirstPersonCamera : MonoBehaviourPunCallbacks
 {
 	public float MouseSensitivity = 1f;
 
@@ -10,9 +11,16 @@ public class FirstPersonCamera : MonoBehaviour
 	private float verticalRotation;
 	private float horizontalRotation;
 
-	void LateUpdate()
-	{
+	private PhotonView PV;
 
+	void Awake()
+	{
+		PV = GetComponent<PhotonView>();
+	}
+
+	void Update()
+	{
+		if (!PV.IsMine) return;
 
 		float mouseX = Input.GetAxis("Mouse X");
 		float mouseY = Input.GetAxis("Mouse Y");
