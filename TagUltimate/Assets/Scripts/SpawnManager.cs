@@ -4,10 +4,23 @@ using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
 {
-	public static SpawnManager Instance;
+	public static SpawnManager Current;
 
 	public Transform[] SeekerSpawnPoints;
 	public Transform[] HiderSpawnPoints;
+
+
+	void Awake()
+	{
+		if (Current != null && Current != this)
+		{
+			Destroy(this.gameObject);
+		}
+		else
+		{
+			Current = this;
+		}
+	}
 
 	// Start is called before the first frame update
 	void Start()

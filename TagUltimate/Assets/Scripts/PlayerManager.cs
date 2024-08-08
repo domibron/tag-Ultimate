@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Photon.Pun;
+using Photon.Pun.UtilityScripts;
 using Photon.Realtime;
 using TMPro;
 using UnityEngine;
@@ -45,6 +46,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 	float timeLeft;
 	float respawnTime = 3f;
 
+	private int SeekerCount = 0;
+	private int HiderCount = 0;
+
 	void Awake()
 	{
 		PV = GetComponent<PhotonView>();
@@ -60,6 +64,15 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 			if (_player.IsMasterClient)
 			{
 				masterPlayer = _player;
+			}
+
+			if ((int)_player.CustomProperties["team"] == 0)
+			{
+				SeekerCount++;
+			}
+			else if ((int)_player.CustomProperties["team"] == 1)
+			{
+				HiderCount++;
 			}
 		}
 
@@ -151,7 +164,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
 			//string textHolder = $"{minutes}:{Mathf.RoundToInt(seconds)}"; // time left display - currently for mins and secs.
 
-			TopMidInfo.text = $"Time remaining: <mspace=30>{textHolder}";
+
+
+			TopMidInfo.text = $"Time remaining: <mspace=30>{textHolder}</mspace>\nSeekers Remaining: {SeekerCount} | Hiders Remaining {HiderCount}";
 
 			// ==== end match logic ====
 			if (PhotonNetwork.IsMasterClient && matchTime <= 0)
@@ -185,14 +200,14 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
 		if ((int)PV.Owner.CustomProperties["team"] == 0)
 		{
-			spawnpoint = SpawnManager.Instance.GetSeekerSpawnPoint();
-			controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerSeekerPrefab"), spawnpoint.position, spawnpoint.rotation, 0, new object[] { PV.ViewID });
+			spawnpoint = SpawnManager.Current.GetSeekerSpawnPoint();
+			controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerSeeker"), spawnpoint.position, spawnpoint.rotation, 0, new object[] { PV.ViewID });
 
 		}
 		else if ((int)PV.Owner.CustomProperties["team"] == 1)
 		{
-			spawnpoint = SpawnManager.Instance.GetHiderSpawnPoint();
-			controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerHiderPrefab"), spawnpoint.position, spawnpoint.rotation, 0, new object[] { PV.ViewID });
+			spawnpoint = SpawnManager.Current.GetHiderSpawnPoint();
+			controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerHider"), spawnpoint.position, spawnpoint.rotation, 0, new object[] { PV.ViewID });
 		}
 
 
@@ -233,7 +248,16 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 		hash.Add("team", 0);
 		PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
 
+		PV.RPC(nameof(ConverToSeeker), RpcTarget.All);
+
 		StartCoroutine(Respawn());
+	}
+
+	[PunRPC]
+	public void ConverToSeeker()
+	{
+		HiderCount--;
+		SeekerCount++;
 	}
 
 	public void GetKill()
