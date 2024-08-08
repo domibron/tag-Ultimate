@@ -84,7 +84,7 @@ public class SeekerExplosion : MonoBehaviour
 		[PunRPC]
 		void AddExploForce(float force, Vector3 pos, float range)
 		{
-			GetComponent<Rigidbody>()?.AddExplosionForce(force, pos, range);
+			GetComponent<Rigidbody>().AddExplosionForce(force, pos, range);
 		}
 
 		if (Input.GetKeyDown(KeyCode.E))
