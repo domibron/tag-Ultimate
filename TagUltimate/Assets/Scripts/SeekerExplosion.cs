@@ -19,6 +19,12 @@ public class SeekerExplosion : MonoBehaviour
 
 	public Image ExplosionCountDownImage;
 
+
+	void Awake()
+	{
+		PV = GetComponent<PhotonView>();
+	}
+
 	// Start is called before the first frame update
 	void Start()
 	{
