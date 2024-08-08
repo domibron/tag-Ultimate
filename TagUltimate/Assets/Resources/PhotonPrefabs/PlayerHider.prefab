@@ -555,7 +555,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6509053583000346139}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 64179f3720bbfe947b7724caa67b7c1d, type: 3}
   m_Name: 
@@ -641,6 +641,8 @@ MonoBehaviour:
   Orientation: {fileID: 7011810577891344373}
   IsGrounded: 0
   GravityVector: {x: 0, y: -9.81, z: 0}
+  MaxHealth: 100
+  CurrentHealth: 100
 --- !u!114 &1909321901016143972
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -655,6 +657,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ThingsToRemove:
   - {fileID: 9080905314089513006}
+  - {fileID: 6033527109079669864}
 --- !u!1 &6851776405732297963
 GameObject:
   m_ObjectHideFlags: 0
@@ -739,7 +742,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1209063310257022887}
-  - component: {fileID: 7659598128408772191}
   m_Layer: 3
   m_Name: Cam Holder
   m_TagString: Untagged
@@ -764,22 +766,6 @@ Transform:
   - {fileID: 340577467775569262}
   m_Father: {fileID: 7011810577891344373}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7659598128408772191
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8914445117099894758}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &9080905314089513006
 GameObject:
   m_ObjectHideFlags: 0

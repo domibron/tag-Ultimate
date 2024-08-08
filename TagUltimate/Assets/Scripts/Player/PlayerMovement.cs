@@ -5,7 +5,7 @@ using Photon;
 using UnityEngine.UI;
 using Photon.Pun;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : MonoBehaviour, IDamageable
 {
 	public Rigidbody rb;
 
@@ -32,6 +32,11 @@ public class PlayerMovement : MonoBehaviour
 
 	public Vector3 GravityVector = new Vector3(0, -9.81f, 0);
 
+	public float MaxHealth = 100f;
+	public float CurrentHealth = 100f;
+
+	private PlayerManager PlayerManagerForPlayer;
+
 	// Start is called before the first frame update
 	void Awake()
 	{
@@ -39,6 +44,16 @@ public class PlayerMovement : MonoBehaviour
 
 
 		PV = GetComponent<PhotonView>();
+
+
+		PlayerManagerForPlayer = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<PlayerManager>();
+	}
+
+	void Start()
+	{
+		if (!PV.IsMine) return;
+
+		CurrentHealth = MaxHealth;
 	}
 
 
@@ -66,7 +81,6 @@ public class PlayerMovement : MonoBehaviour
 		}
 		else
 		{
-			print("De");
 			Vector3 deAcceleration = -rbVelWithNoY * PlayerDeacceleration;
 
 			if (IsGrounded) deAcceleration = Vector3.ProjectOnPlane(deAcceleration, normal);
@@ -112,6 +126,32 @@ public class PlayerMovement : MonoBehaviour
 
 
 		}
+	}
+
+	public void TakeDamage(float damage)
+	{
+		PV.RPC(nameof(RPC_TakeDamage), PV.Owner, damage);
+	}
+
+	[PunRPC]
+	void RPC_TakeDamage(float damage, PhotonMessageInfo info)
+	{
+		if ((int)PV.Owner.CustomProperties["team"] == 0) return;
+
+		CurrentHealth -= damage;
+
+		//healthbarImage.fillAmount = currentHealth / maxHealth;
+
+		if (CurrentHealth <= 0)
+		{
+			Die();
+			//PlayerManager.Find(info.Sender).GetKill();
+		}
+	}
+
+	void Die() // function to call to kill player
+	{
+		PlayerManagerForPlayer.Die();
 	}
 }
 
