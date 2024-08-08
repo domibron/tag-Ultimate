@@ -571,7 +571,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6509053583000346139}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
   m_Name: 
@@ -637,8 +637,8 @@ MonoBehaviour:
   PlayerDeacceleration: 0.1
   BoostForce: 15
   BoostCooldown: 5
-  BoostImage: {fileID: 0}
-  Orientation: {fileID: 0}
+  BoostImage: {fileID: 4973652848106739241}
+  Orientation: {fileID: 7011810577891344373}
   IsGrounded: 0
   GravityVector: {x: 0, y: -9.81, z: 0}
 --- !u!114 &1909321901016143972
