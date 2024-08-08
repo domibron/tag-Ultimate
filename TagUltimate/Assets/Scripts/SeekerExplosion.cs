@@ -76,16 +76,12 @@ public class SeekerExplosion : MonoBehaviour
 				//collider.GetComponent<Rigidbody>()?.AddExplosionForce(ExplosionForce, transform.position, MaxRange * RageMultForExplosion);
 			}
 
-			PV.RPC(nameof(AddExploForce), RpcTarget.All, ExplosionForce, transform.position, MaxRange * RageMultForExplosion);
+			GetComponent<PlayerMovement>().Expload(ExplosionForce, transform.position, MaxRange * RageMultForExplosion);
 
 			GetComponent<PlayerMovement>().Die();
 		}
 
-		[PunRPC]
-		void AddExploForce(float force, Vector3 pos, float range)
-		{
-			GetComponent<Rigidbody>().AddExplosionForce(force, pos, range);
-		}
+
 
 		if (Input.GetKeyDown(KeyCode.E))
 		{
