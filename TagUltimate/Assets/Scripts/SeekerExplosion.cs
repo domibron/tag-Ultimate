@@ -78,7 +78,6 @@ public class SeekerExplosion : MonoBehaviour
 
 			GetComponent<PlayerMovement>().Expload(ExplosionForce, transform.position, MaxRange * RageMultForExplosion);
 
-			GetComponent<PlayerMovement>().Die();
 		}
 
 
