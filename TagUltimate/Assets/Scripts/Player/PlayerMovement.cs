@@ -169,7 +169,7 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 
 	public void AddForce(Vector3 force, ForceMode forceMode = ForceMode.Force)
 	{
-		PV.RPC(nameof(RPC_AddExploForce), PV.Owner, force, forceMode);
+		PV.RPC(nameof(RPC_AddForce), PV.Owner, force, forceMode);
 	}
 
 	[PunRPC]
