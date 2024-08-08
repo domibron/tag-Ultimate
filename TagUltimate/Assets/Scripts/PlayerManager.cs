@@ -242,13 +242,13 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 	{
 		PhotonNetwork.Destroy(controller);
 
-		deaths++;
+		//deaths++;
 
 		Hashtable hash = new Hashtable();
 		hash.Add("team", 0);
 		PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
 
-		PV.RPC(nameof(ConverToSeeker), RpcTarget.All);
+		if ((int)PV.Owner.CustomProperties["team"] == 0) PV.RPC(nameof(ConverToSeeker), RpcTarget.All);
 
 		StartCoroutine(Respawn());
 	}

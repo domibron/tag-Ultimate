@@ -43,6 +43,7 @@ MonoBehaviour:
   - RPC_SendWinner
   - ConverToSeeker
   - RPC_TakeDamage
+  - <Update>g__AddExploForce|10_0
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

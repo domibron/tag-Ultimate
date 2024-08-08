@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class SeekerExplosion : MonoBehaviour
 {
 	public float MaxRange = 10f;
+	public float RageMultForExplosion = 3f;
 
 	public float ExplosionForce = 100f;
 
@@ -72,10 +73,18 @@ public class SeekerExplosion : MonoBehaviour
 				}
 
 
-				collider.attachedRigidbody.AddExplosionForce(ExplosionForce, transform.position, MaxRange);
+				//collider.GetComponent<Rigidbody>()?.AddExplosionForce(ExplosionForce, transform.position, MaxRange * RageMultForExplosion);
 			}
 
+			PV.RPC(nameof(AddExploForce), RpcTarget.All, ExplosionForce, transform.position, MaxRange * RageMultForExplosion);
+
 			GetComponent<PlayerMovement>().Die();
+		}
+
+		[PunRPC]
+		void AddExploForce(float force, Vector3 pos, float range)
+		{
+			GetComponent<Rigidbody>()?.AddExplosionForce(force, pos, range);
 		}
 
 		if (Input.GetKeyDown(KeyCode.E))
