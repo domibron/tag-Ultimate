@@ -44,6 +44,13 @@ MonoBehaviour:
   - ConverToSeeker
   - RPC_TakeDamage
   - <Update>g__AddExploForce|10_0
+  - RPC_AddExploForce
+  - RPC_AddForce
+  - RPC_HiderCaught
+  - RPC_SeekerGone
+  - RPC_DisconnectEveryoneAndHost
+  - ChangeHiders
+  - ChangeSeekers
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
