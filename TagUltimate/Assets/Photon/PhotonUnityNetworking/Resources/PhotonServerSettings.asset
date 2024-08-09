@@ -51,6 +51,10 @@ MonoBehaviour:
   - RPC_DisconnectEveryoneAndHost
   - ChangeHiders
   - ChangeSeekers
+  - RPC_SpawnObject
+  - RPC_ChangeHiders
+  - RPC_ChangeSeekers
+  - RPC_ReturnToRoom
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

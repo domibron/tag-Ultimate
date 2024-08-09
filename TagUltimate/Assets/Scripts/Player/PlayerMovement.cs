@@ -116,6 +116,11 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 			Die();
 			//PlayerManager.Find(info.Sender).GetKill();
 		}
+
+		if (transform.position.y <= KillZone.Current.YLevel)
+		{
+			Die();
+		}
 	}
 
 

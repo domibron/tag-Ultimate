@@ -184,12 +184,14 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 				// handle kill count
 
 				//TODO can replace with win screen.
+				//ReturnToRoom();
 				ForceEveryoneToLeave();
 			}
 
 			if (HiderCount <= 0 && PhotonNetwork.IsMasterClient && PhotonNetwork.CurrentRoom.PlayerCount > 1)
 			{
 				//TODO can replace with win screen.
+				//ReturnToRoom();
 				ForceEveryoneToLeave();
 			}
 
@@ -261,7 +263,10 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 		hash.Add("team", 0);
 		PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
 
-		if ((int)PV.Owner.CustomProperties["team"] == 1) PV.RPC(nameof(ConverToSeeker), RpcTarget.All);
+		if ((int)PV.Owner.CustomProperties["team"] == 1)
+		{
+			PV.RPC(nameof(ConverToSeeker), RpcTarget.MasterClient);
+		}
 
 		StartCoroutine(Respawn());
 	}
@@ -269,8 +274,13 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 	[PunRPC]
 	public void ConverToSeeker()
 	{
-		HiderCount--;
-		SeekerCount++;
+		Hashtable hashtable = new Hashtable();
+
+		hashtable.Add("Hiders", (int)PhotonNetwork.CurrentRoom.CustomProperties["Hiders"] - 1);
+		hashtable.Add("Seekers", (int)PhotonNetwork.CurrentRoom.CustomProperties["Seekers"] + 1);
+
+
+		PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
 
 
 	}
@@ -281,7 +291,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 	}
 
 	[PunRPC]
-	void ChangeHiders(int ammount)
+	void RPC_ChangeHiders(int ammount)
 	{
 		Hashtable hashtable = new Hashtable();
 
@@ -292,7 +302,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 	}
 
 	[PunRPC]
-	void ChangeSeekers(int ammount)
+	void RPC_ChangeSeekers(int ammount)
 	{
 		Hashtable hashtable = new Hashtable();
 
@@ -363,6 +373,22 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
 	// ====================== leave room management ======================
 
+	public void ReturnToRoom()
+	{
+		PhotonNetwork.LoadLevel(0);
+	}
+
+	[PunRPC]
+	public void RPC_ReturnToRoom()
+	{
+		isGameOver = true;
+
+
+		StopCoroutine(Respawn());
+
+		Destroy(this.gameObject);
+	}
+
 	public void ForceEveryoneToLeave()
 	{
 		PV.RPC(nameof(RPC_DisconnectEveryoneAndHost), RpcTarget.All);
@@ -376,6 +402,15 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
 	public void leaveRoom()
 	{
+		if ((int)PhotonNetwork.LocalPlayer.CustomProperties["team"] == 0)
+		{
+			PV.RPC(nameof(RPC_ChangeSeekers), PhotonNetwork.MasterClient, -1);
+		}
+		else if ((int)PhotonNetwork.LocalPlayer.CustomProperties["team"] == 1)
+		{
+			PV.RPC(nameof(RPC_ChangeHiders), PhotonNetwork.MasterClient, -1);
+		}
+
 		PhotonNetwork.AutomaticallySyncScene = false;
 
 		Destroy(RoomManager.Current.gameObject);

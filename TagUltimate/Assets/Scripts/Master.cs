@@ -6,37 +6,50 @@ using System;
 
 public class Master : MonoBehaviourPunCallbacks
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        Debug.Log("connecting to Lobby");
-        PhotonNetwork.ConnectUsingSettings();
+	// Start is called before the first frame update
+	void Start()
+	{
+		Debug.Log("connecting to Lobby");
+
+		if (!PhotonNetwork.IsConnected)
+		{
+			PhotonNetwork.ConnectUsingSettings();
+		}
+		else if (PhotonNetwork.InRoom)
+		{
+			MainMenu.current.Open(2);
+		}
+
+		//Cursor.lockState = CursorLockMode.None;
+		//Cursor.visible = true;
 
 
-        //Cursor.lockState = CursorLockMode.None;
-        //Cursor.visible = true;
-    }
+	}
 
-    // Update is called once per frame
-    void Update()
-    {
+	// Update is called once per frame
+	void Update()
+	{
 
 
-    }
+	}
 
-    public override void OnConnectedToMaster()
-    {
-        base.OnConnectedToMaster();
+	public override void OnConnectedToMaster()
+	{
 
-        Debug.Log("Connected to Master");
-        PhotonNetwork.JoinLobby();
-        PhotonNetwork.AutomaticallySyncScene = true;
-        
-    }
 
-    public override void OnJoinedLobby()
-    {
-        Debug.Log("Joined lobby");
-        //if (MainMenu.current != null) MainMenu.current.Open(0);
-    }
+		base.OnConnectedToMaster();
+
+		Debug.Log("Connected to Master");
+		PhotonNetwork.JoinLobby();
+		PhotonNetwork.AutomaticallySyncScene = true;
+
+	}
+
+	public override void OnJoinedLobby()
+	{
+		Debug.Log("Joined lobby");
+		//if (MainMenu.current != null) MainMenu.current.Open(0);
+	}
+
+
 }
