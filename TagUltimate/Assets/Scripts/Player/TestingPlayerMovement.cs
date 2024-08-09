@@ -124,9 +124,9 @@ public class TestingPlayerMovement : MonoBehaviour
     {
         if (rb.useGravity) return;
 
-        if (!IsGrounded) rb.AddForce(Physics.gravity, ForceMode.Force);
+        if (!IsGrounded) rb.AddForce(GravityVector, ForceMode.Force);
 
-        else if (rb.velocity.y >= Physics.gravity.y) rb.AddForce(Physics.gravity, ForceMode.Force);
+        else if (rb.velocity.y >= GravityVector.y) rb.AddForce(GravityVector, ForceMode.Force);
     }
 
     void HandleGroundCheck()
