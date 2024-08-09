@@ -9,6 +9,7 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class MainMenu : MonoBehaviourPunCallbacks
 {
+	#region Variables
 	public List<RoomInfo> Rooms = new List<RoomInfo>();
 
 	public static MainMenu current;
@@ -46,6 +47,9 @@ public class MainMenu : MonoBehaviourPunCallbacks
 	[Space]
 	public GameObject StartGameButton;
 
+	#endregion
+
+	#region Awake
 	// Start is called before the first frame update
 	void Awake()
 	{
@@ -58,19 +62,29 @@ public class MainMenu : MonoBehaviourPunCallbacks
 			current = this;
 		}
 
+		Application.targetFrameRate = 60;
+
+
+
 		Open(4);
 	}
+	#endregion
+
+	#region Start
 	void Start()
 	{
 
 		Cursor.lockState = CursorLockMode.None;
 		Cursor.visible = true;
 
+
 		//Debug.Log("Connecting to Lobby");
 		//PhotonNetwork.ConnectUsingSettings();
 		//versionText.text = $"{Application.version}<br>Created by domibron<br>https://domibron.itch.io/expoint";
 	}
+	#endregion
 
+	#region Open
 	public void Open(int UIIndex)
 	{
 		for (int i = 0; i < UI.Length; i++)
@@ -85,7 +99,9 @@ public class MainMenu : MonoBehaviourPunCallbacks
 			}
 		}
 	}
+	#endregion
 
+	#region CloseAll
 	public void CloseAll()
 	{
 		for (int i = 0; i < UI.Length; i++)
@@ -93,8 +109,9 @@ public class MainMenu : MonoBehaviourPunCallbacks
 			UI[i].SetActive(false);
 		}
 	}
+	#endregion
 
-
+	#region Update
 	void Update()
 	{
 		if (PhotonNetwork.InRoom)
@@ -116,22 +133,26 @@ public class MainMenu : MonoBehaviourPunCallbacks
 				MaxTimeSliderText.text = $"Match Time: {MaxTimeSlider.value} / {MaxTimeSlider.maxValue}";
 		}
 	}
+	#endregion
 
-
-
+	#region OnConnectedToMaster
 	public override void OnConnectedToMaster()
 	{
 		//Debug.Log("Connected to Master");
 		//PhotonNetwork.JoinLobby();
 		//PhotonNetwork.AutomaticallySyncScene = true;
 	}
+	#endregion
 
+	#region OnJoinedLobby
 	public override void OnJoinedLobby()
 	{
 		Open(0);
 		//Debug.Log("Joined Lobby");
 	}
+	#endregion
 
+	#region CreateTeamRoom
 	public void CreateTeamRoom()
 	{
 		string roomName = RoomNameInputField.text;
@@ -148,14 +169,16 @@ public class MainMenu : MonoBehaviourPunCallbacks
 			MaxPlayers = (byte)MaxPlayersSlider.value
 		};
 
-		float float1 = (MaxTimeSlider.value == 0 ? 99999 : MaxTimeSlider.value); // stops cringe
-																				 //int int1 = (MaxKillsSlider.value == 0 ? 9999 : (int)MaxKillsSlider.value); // stops early end game
+		float float1 = (MaxTimeSlider.value == 0 ? 99999 : MaxTimeSlider.value * 60f); // stops cringe
+																					   //int int1 = (MaxKillsSlider.value == 0 ? 9999 : (int)MaxKillsSlider.value); // stops early end game
 
 		// room properties
 		Hashtable RoomCustomProps = new Hashtable();
 		RoomCustomProps.Add("MasterTime", float1);
 		//RoomCustomProps.Add("MasterKills", int1);
 		RoomCustomProps.Add("MasterCT", 600f);
+		RoomCustomProps.Add("Seekers", 0);
+		RoomCustomProps.Add("Hiders", 0);
 		//RoomCustomProps.Add("Version", Application.version);
 		roomOptions.CustomRoomProperties = RoomCustomProps;
 		// https://youtu.be/aVUNiJ3MVSg
@@ -166,16 +189,17 @@ public class MainMenu : MonoBehaviourPunCallbacks
 
 		Open(4);
 	}
+	#endregion
 
-
+	#region OnJoinedRoom
 	public override void OnJoinedRoom()
 	{
 
 
-		int teamCount = 0; // ? what is this ment for?
-		Dictionary<int, Transform> teams = new Dictionary<int, Transform>();
-		teams.Add(0, playerListTeamA);
-		teams.Add(1, playerListTeamB);
+		// int teamCount = 0; // ? what is this ment for?
+		// Dictionary<int, Transform> teams = new Dictionary<int, Transform>();
+		// teams.Add(0, playerListTeamA);
+		// teams.Add(1, playerListTeamB);
 
 		//if (Application.version != PhotonNetwork.CurrentRoom.CustomProperties["Version"].ToString())
 		//{
@@ -216,13 +240,21 @@ public class MainMenu : MonoBehaviourPunCallbacks
 			Hashtable props = new Hashtable();
 			props.Add("team", 0);
 			players[i].CustomProperties = props;
+
+			Hashtable hashtable = new Hashtable();
+			hashtable.Add("Seekers", (int)PhotonNetwork.CurrentRoom.CustomProperties["Seekers"] + 1);
+			PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+
+
 		}
 
 		StartGameButton.SetActive(PhotonNetwork.IsMasterClient);
 		////mapSelectionPanel.SetActive(PhotonNetwork.IsMasterClient);
 
 	}
+	#endregion
 
+	#region  SwichTeams
 	public void SwichTeams()
 	{
 		int x = (int)PhotonNetwork.LocalPlayer.CustomProperties["team"];
@@ -243,6 +275,12 @@ public class MainMenu : MonoBehaviourPunCallbacks
 			}
 
 			Instantiate(PlayerListItemPrefab, playerListTeamA).GetComponent<PlayerListItem>().SetUp(PhotonNetwork.LocalPlayer);
+
+			Hashtable hashtable = new Hashtable();
+			hashtable.Add("Seekers", (int)PhotonNetwork.CurrentRoom.CustomProperties["Seekers"] - 1);
+			hashtable.Add("Hiders", (int)PhotonNetwork.CurrentRoom.CustomProperties["Hiders"] + 1);
+			PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+
 		}
 		else if (x == 1)
 		{
@@ -259,12 +297,17 @@ public class MainMenu : MonoBehaviourPunCallbacks
 				}
 			}
 
+			Hashtable hashtable = new Hashtable();
+			hashtable.Add("Seekers", (int)PhotonNetwork.CurrentRoom.CustomProperties["Seekers"] + 1);
+			hashtable.Add("Hiders", (int)PhotonNetwork.CurrentRoom.CustomProperties["Hiders"] - 1);
+			PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
 
 			Instantiate(PlayerListItemPrefab, playerListTeamB).GetComponent<PlayerListItem>().SetUp(PhotonNetwork.LocalPlayer);
 		}
 	}
+	#endregion
 
-
+	#region OnPlayerPropertiesUpdate
 	public override void OnPlayerPropertiesUpdate(Player target, Hashtable hashtable)
 	{
 		if (hashtable.ContainsKey("team"))
@@ -315,20 +358,25 @@ public class MainMenu : MonoBehaviourPunCallbacks
 			}
 		}
 	}
+	#endregion
 
 
+	#region  OnPlayerEnteredRoom
 	public override void OnPlayerEnteredRoom(Player newPlayer)
 	{
 		StartCoroutine(InstaceButDelayed(newPlayer));
 	}
+	#endregion
 
+	#region InstaceButDelayed
 	IEnumerator InstaceButDelayed(Player newPlayer)
 	{
 		yield return new WaitForSeconds(0.1f);
 		Instantiate(PlayerListItemPrefab, playerListTeamA).GetComponent<PlayerListItem>().SetUp(newPlayer);
 	}
+	#endregion
 
-
+	#region OnCreateRoomFailed
 	public override void OnCreateRoomFailed(short returnCode, string message)
 	{
 		////errorText.text = $"Room Creation Failed: <color=\"blue\">ERROR CODE = {returnCode} <br><color=\"yellow\">REASON: {message}";
@@ -337,20 +385,25 @@ public class MainMenu : MonoBehaviourPunCallbacks
 		Open(0);
 
 	}
+	#endregion
 
+	#region OnMasterClientSwitched
 	public override void OnMasterClientSwitched(Player newMasterClient)
 	{
 		StartGameButton.SetActive(PhotonNetwork.IsMasterClient);
 	}
+	#endregion
 
-	public void StartGame()
-	{
-		//MenuManager.Instance.OpenMenu("loading");
-		Open(4);
 
-		//PhotonNetwork.LoadLevel(MapManager.Instance.currentMapNumber);
-	}
+	// public void StartGame()
+	// {
+	// 	//MenuManager.Instance.OpenMenu("loading");
+	// 	Open(4);
 
+	// 	//PhotonNetwork.LoadLevel(MapManager.Instance.currentMapNumber);
+	// }
+
+	#region StartTeamGame
 	public void StartTeamGame()
 	{
 		//MenuManager.Instance.OpenMenu("loading");
@@ -358,7 +411,9 @@ public class MainMenu : MonoBehaviourPunCallbacks
 
 		PhotonNetwork.LoadLevel(1);
 	}
+	#endregion
 
+	#region LeaveRoom
 	public void LeaveRoom()
 	{
 		PhotonNetwork.LeaveRoom();
@@ -366,7 +421,9 @@ public class MainMenu : MonoBehaviourPunCallbacks
 		Open(4);
 
 	}
+	#endregion
 
+	#region JoinRoom
 	public void JoinRoom(RoomInfo info)
 	{
 		//if (info.CustomProperties["Version"] == null)
@@ -385,7 +442,9 @@ public class MainMenu : MonoBehaviourPunCallbacks
 			OnJoinRoomFailed(3232, "Room is full or no longer exists");
 		}
 	}
+	#endregion
 
+	#region OnJoinRoomFailed
 	public override void OnJoinRoomFailed(short returnCode, string message)
 	{
 		//errorText.text = $"Room Join Failed: <color=\"blue\">ERROR CODE = {returnCode} <br><color=\"yellow\">REASON: {message}</color>";
@@ -394,7 +453,9 @@ public class MainMenu : MonoBehaviourPunCallbacks
 
 		Open(0);
 	}
+	#endregion
 
+	#region OnLeftRoom
 	public override void OnLeftRoom()
 	{
 		//MenuManager.Instance.OpenMenu("title");
@@ -403,7 +464,9 @@ public class MainMenu : MonoBehaviourPunCallbacks
 
 		Open(0);
 	}
+	#endregion
 
+	#region OnRoomListUpdate
 	public override void OnRoomListUpdate(List<RoomInfo> p_list)
 	{
 		base.OnRoomListUpdate(p_list);
@@ -466,7 +529,9 @@ public class MainMenu : MonoBehaviourPunCallbacks
 			Instantiate(roomListItemPrefab, roomListContent).GetComponent<RoomListItem>().SetUp(room);
 		}
 	}
+	#endregion
 
+	#region ClearRoomList
 	public void ClearRoomList()
 	{
 		foreach (Transform trans in roomListContent)
@@ -474,15 +539,17 @@ public class MainMenu : MonoBehaviourPunCallbacks
 			Destroy(trans.gameObject);
 		}
 	}
+	#endregion
 
 
 
 
 
 
-
+	#region QuitGame
 	public void QuitGame()
 	{
 		Application.Quit();
 	}
+	#endregion
 }

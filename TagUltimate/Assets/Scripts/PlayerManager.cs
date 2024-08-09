@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -6,6 +7,7 @@ using Photon.Pun;
 using Photon.Pun.UtilityScripts;
 using Photon.Realtime;
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
@@ -128,9 +130,12 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 	{
 		ranPrimary = true;
 
-		matchDuration = (float)PhotonNetwork.CurrentRoom.CustomProperties["MasterTime"] * 60;
+		matchDuration = (float)PhotonNetwork.CurrentRoom.CustomProperties["MasterTime"] * 60f;
 		//maxKills = (int)PhotonNetwork.CurrentRoom.CustomProperties["MasterKills"];
 		matchTime = (float)PhotonNetwork.CurrentRoom.CustomProperties["MasterCT"]; // DO NOT REMOVE THIS - the time does not set to matchDuration.
+
+		SeekerCount = (int)PhotonNetwork.CurrentRoom.CustomProperties["Seekers"];
+		HiderCount = (int)PhotonNetwork.CurrentRoom.CustomProperties["Hiders"];
 
 		matchTime = matchDuration;
 
@@ -169,7 +174,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 			TopMidInfo.text = $"Time remaining: <mspace=30>{textHolder}</mspace>\nSeekers Remaining: {SeekerCount} | Hiders Remaining {HiderCount}";
 
 			// ==== end match logic ====
-			if (PhotonNetwork.IsMasterClient && matchTime <= 0)
+			if (PhotonNetwork.IsMasterClient && matchTime <= 0 && PhotonNetwork.CurrentRoom.PlayerCount > 1)
 			{
 				// GameOver send RPC event
 				//Scoreboard.Instance.GetPlayerKills(Scoreboard.Instance.GetPlayerWithMostKills());
@@ -177,6 +182,15 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 				//PV.RPC(nameof(RPC_SendWinner), RpcTarget.All, Scoreboard.Instance.GetPlayerWithMostKills(), Scoreboard.Instance.GetMostKillsInGame());
 
 				// handle kill count
+
+				//TODO can replace with win screen.
+				ForceEveryoneToLeave();
+			}
+
+			if (HiderCount <= 0 && PhotonNetwork.IsMasterClient && PhotonNetwork.CurrentRoom.PlayerCount > 1)
+			{
+				//TODO can replace with win screen.
+				ForceEveryoneToLeave();
 			}
 
 			// if (kills >= maxKills)
@@ -257,12 +271,36 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 	{
 		HiderCount--;
 		SeekerCount++;
+
+
 	}
 
 	public void GetKill()
 	{
 		PV.RPC(nameof(RPC_GetKill), PV.Owner);
 	}
+
+	[PunRPC]
+	void ChangeHiders(int ammount)
+	{
+		Hashtable hashtable = new Hashtable();
+
+		hashtable.Add("Hiders", (int)PhotonNetwork.CurrentRoom.CustomProperties["Hiders"] + ammount);
+
+
+		PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+	}
+
+	[PunRPC]
+	void ChangeSeekers(int ammount)
+	{
+		Hashtable hashtable = new Hashtable();
+
+		hashtable.Add("Seekers", (int)PhotonNetwork.CurrentRoom.CustomProperties["Seekers"] + ammount);
+
+		PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+	}
+
 
 	[PunRPC]
 	void RPC_GetKill()
@@ -311,8 +349,30 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 		// need to do this
 	}
 
+	public void SpawnObject(string path, Vector3 pos, Quaternion rotaton)
+	{
+		PV.RPC(nameof(RPC_SpawnObject), RpcTarget.All, path, pos, rotaton);
+	}
+
+
+	[PunRPC]
+	void RPC_SpawnObject(String path, Vector3 pos, Quaternion rotaton)
+	{
+		Instantiate(Resources.Load(path), pos, rotaton);
+	}
 
 	// ====================== leave room management ======================
+
+	public void ForceEveryoneToLeave()
+	{
+		PV.RPC(nameof(RPC_DisconnectEveryoneAndHost), RpcTarget.All);
+	}
+
+	[PunRPC]
+	void RPC_DisconnectEveryoneAndHost()
+	{
+		leaveRoom();
+	}
 
 	public void leaveRoom()
 	{
@@ -332,6 +392,6 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 		//while(PhotonNetwork.InRoom)
 		while (PhotonNetwork.InRoom)
 			yield return null;
-		SceneManager.LoadScene(1);
+		SceneManager.LoadScene(0);
 	}
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using Photon.Pun;
 using UnityEngine;
 using UnityEngine.UI;
@@ -80,8 +81,9 @@ public class SeekerExplosion : MonoBehaviour
 
 			//GetComponent<PlayerMovement>().Expload(ExplosionForce, transform.position, MaxRange * RageMultForExplosion);
 
-			GetComponent<PlayerMovement>().Die();
+			GetComponent<PlayerMovement>().PlayerManagerForPlayer.SpawnObject(Path.Combine("PhotonPrefabs", "ExploParticles"), transform.position, transform.rotation);
 
+			GetComponent<PlayerMovement>().Die();
 
 		}
 

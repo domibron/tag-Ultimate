@@ -35,7 +35,10 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 	public float MaxHealth = 100f;
 	public float CurrentHealth = 100f;
 
-	private PlayerManager PlayerManagerForPlayer;
+	public PlayerManager PlayerManagerForPlayer;
+
+	public Image HealthImage;
+
 
 	// Start is called before the first frame update
 	void Awake()
@@ -54,6 +57,9 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 		if (!PV.IsMine) return;
 
 		CurrentHealth = MaxHealth;
+
+		//if ((int)PV.Owner.CustomProperties["team"] == 0) HealthImage.gameObject.SetActive(false);
+		if ((int)PV.Owner.CustomProperties["team"] == 1) HealthImage.gameObject.SetActive(true);
 	}
 
 
@@ -68,7 +74,6 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 		Vector3 move = Orientation.right * Input.GetAxisRaw("Horizontal") + Orientation.forward * Input.GetAxisRaw("Vertical");
 
 		Vector3 rbVelWithNoY = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-
 
 
 		if (move.normalized.magnitude != 0)
@@ -99,6 +104,17 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 			rb.AddForce(Orientation.forward * BoostForce, ForceMode.Impulse);
 
 			boostWaitTime = BoostCooldown;
+		}
+
+		if ((int)PV.Owner.CustomProperties["team"] == 1)
+		{
+			HealthImage.fillAmount = CurrentHealth / MaxHealth;
+		}
+
+		if (CurrentHealth <= 0)
+		{
+			Die();
+			//PlayerManager.Find(info.Sender).GetKill();
 		}
 	}
 
