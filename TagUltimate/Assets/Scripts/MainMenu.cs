@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
+using System;
 
 public class MainMenu : MonoBehaviourPunCallbacks
 {
@@ -77,6 +78,10 @@ public class MainMenu : MonoBehaviourPunCallbacks
 		Cursor.lockState = CursorLockMode.None;
 		Cursor.visible = true;
 
+		if (PhotonNetwork.InRoom)
+		{
+			ReloadRoom();
+		}
 
 		//Debug.Log("Connecting to Lobby");
 		//PhotonNetwork.ConnectUsingSettings();
@@ -160,7 +165,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
 
 		if (string.IsNullOrEmpty(RoomNameInputField.text))
 		{
-			roomName = $"ROOM {Random.Range(0, 9999999)}";
+			roomName = $"ROOM {UnityEngine.Random.Range(0, 9999999)}";
 		}
 
 
@@ -219,7 +224,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
 		{
 			if ((PhotonNetwork.LocalPlayer.NickName == player.NickName && !player.IsLocal) || (PhotonNetwork.LocalPlayer.NickName == string.Empty)) // see if you can put this in OnPlayerEnteredRoom
 			{
-				PhotonNetwork.LocalPlayer.NickName = PhotonNetwork.LocalPlayer.NickName + Random.Range(0, 9999).ToString("0000");
+				PhotonNetwork.LocalPlayer.NickName = PhotonNetwork.LocalPlayer.NickName + UnityEngine.Random.Range(0, 9999).ToString("0000");
 			}
 		}
 
@@ -232,20 +237,43 @@ public class MainMenu : MonoBehaviourPunCallbacks
 			Destroy(child.gameObject);
 		}
 
+		int teamToSelect = 0;
+		if ((int)PhotonNetwork.CurrentRoom.CustomProperties["Seekers"] > (int)PhotonNetwork.CurrentRoom.CustomProperties["Hiders"])
+		{
+			teamToSelect = 1;
+			Hashtable hash = new Hashtable();
+			hash.Add("Hiders", (int)PhotonNetwork.CurrentRoom.CustomProperties["Hiders"] + 1);
+			PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
+		}
+		else
+		{
+			Hashtable hash = new Hashtable();
+			hash.Add("Seekers", (int)PhotonNetwork.CurrentRoom.CustomProperties["Seekers"] + 1);
+			PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
+		}
 
+		Hashtable hashtable = new Hashtable();
+		hashtable.Add("team", teamToSelect);
+
+		PhotonNetwork.LocalPlayer.SetCustomProperties(hashtable);
+
+
+
+		// int alt = 0;
 		for (int i = 0; i < players.Length; i++)
 		{
-			Instantiate(PlayerListItemPrefab, playerListTeamA).GetComponent<PlayerListItem>().SetUp(players[i]);
-
-			Hashtable props = new Hashtable();
-			props.Add("team", 0);
-			players[i].CustomProperties = props;
-
-			Hashtable hashtable = new Hashtable();
-			hashtable.Add("Seekers", (int)PhotonNetwork.CurrentRoom.CustomProperties["Seekers"] + 1);
-			PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
-
-
+			if (players[i].CustomProperties["team"] == null)
+			{
+				Debug.LogWarning(players[i].NickName + " Does not have a team");
+			}
+			else if ((int)players[i].CustomProperties["team"] == 0)
+			{
+				Instantiate(PlayerListItemPrefab, playerListTeamA).GetComponent<PlayerListItem>().SetUp(players[i]);
+			}
+			else
+			{
+				Instantiate(PlayerListItemPrefab, playerListTeamB).GetComponent<PlayerListItem>().SetUp(players[i]);
+			}
 		}
 
 		StartGameButton.SetActive(PhotonNetwork.IsMasterClient);
@@ -253,6 +281,45 @@ public class MainMenu : MonoBehaviourPunCallbacks
 
 	}
 	#endregion
+
+
+	#region ReloadRoom
+	public void ReloadRoom()
+	{
+		Open(2);
+		RoomNameText.text = PhotonNetwork.CurrentRoom.Name;
+
+		TotalPlayersInLobbyText.text = $"{PhotonNetwork.CurrentRoom.PlayerCount} / {PhotonNetwork.CurrentRoom.MaxPlayers}";
+
+		Player[] players = PhotonNetwork.PlayerList;
+
+
+		foreach (Transform child in playerListTeamA)
+		{
+			Destroy(child.gameObject);
+		}
+		foreach (Transform child in playerListTeamB)
+		{
+			Destroy(child.gameObject);
+		}
+
+		// int alt = 0;
+		for (int i = 0; i < players.Length; i++)
+		{
+			if ((int)players[i].CustomProperties["team"] == 0)
+			{
+				Instantiate(PlayerListItemPrefab, playerListTeamA).GetComponent<PlayerListItem>().SetUp(players[i]);
+			}
+			else
+			{
+				Instantiate(PlayerListItemPrefab, playerListTeamB).GetComponent<PlayerListItem>().SetUp(players[i]);
+			}
+		}
+
+		StartGameButton.SetActive(PhotonNetwork.IsMasterClient);
+	}
+	#endregion
+
 
 	#region  SwichTeams
 	public void SwichTeams()
@@ -372,7 +439,10 @@ public class MainMenu : MonoBehaviourPunCallbacks
 	IEnumerator InstaceButDelayed(Player newPlayer)
 	{
 		yield return new WaitForSeconds(0.1f);
-		Instantiate(PlayerListItemPrefab, playerListTeamA).GetComponent<PlayerListItem>().SetUp(newPlayer);
+		if ((int)newPlayer.CustomProperties["team"] == 0)
+			Instantiate(PlayerListItemPrefab, playerListTeamA).GetComponent<PlayerListItem>().SetUp(newPlayer);
+		else if ((int)newPlayer.CustomProperties["team"] == 1)
+			Instantiate(PlayerListItemPrefab, playerListTeamB).GetComponent<PlayerListItem>().SetUp(newPlayer);
 	}
 	#endregion
 

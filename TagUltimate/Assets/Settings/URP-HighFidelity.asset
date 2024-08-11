@@ -95,11 +95,18 @@ MonoBehaviour:
       bounds:
         m_Center: {x: 0, y: 0, z: 0}
         m_Extent: {x: 81, y: 81, z: 81}
+    - sceneGUID: c70fee3f2a5a8d24d80afc83f3b7055e
+      bounds:
+        m_Center: {x: 0, y: 0, z: 0}
+        m_Extent: {x: 81, y: 81, z: 81}
     serializedHasVolumes:
     - sceneGUID: d1ce8d9e76af08d4ebc33adea7c5b4c3
       hasProbeVolumes: 1
+    - sceneGUID: c70fee3f2a5a8d24d80afc83f3b7055e
+      hasProbeVolumes: 1
     bakingSets:
     - {fileID: 11400000, guid: 6d0e4bc7662ab3842a9ebd6f1dfa0d02, type: 2}
+    - {fileID: 11400000, guid: 1ff8c6cd8c428f64cbeb7a19c6cc31bb, type: 2}
     m_LightingScenario: Default
   m_PrefilteringModeMainLightShadows: 3
   m_PrefilteringModeAdditionalLight: 3

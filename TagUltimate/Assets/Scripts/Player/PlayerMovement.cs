@@ -71,27 +71,7 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 		HandleGroundCheck();
 		HandleGravity();
 
-		Vector3 move = Orientation.right * Input.GetAxisRaw("Horizontal") + Orientation.forward * Input.GetAxisRaw("Vertical");
 
-		Vector3 rbVelWithNoY = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-
-
-		if (move.normalized.magnitude != 0)
-		{
-			move = ((move.normalized * PlayerSpeed) - rbVelWithNoY) * PlayerAcceleration;
-
-			if (IsGrounded) move = Vector3.ProjectOnPlane(move, normal);
-
-			rb.AddForce(move, ForceMode.Force);
-		}
-		else
-		{
-			Vector3 deAcceleration = -rbVelWithNoY * PlayerDeacceleration;
-
-			if (IsGrounded) deAcceleration = Vector3.ProjectOnPlane(deAcceleration, normal);
-
-			rb.AddForce(deAcceleration, ForceMode.Force);
-		}
 
 
 		BoostImage.fillAmount = 1 - (boostWaitTime / BoostCooldown);
@@ -125,6 +105,30 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 		}
 	}
 
+	void FixedUpdate()
+	{
+		Vector3 move = Orientation.right * Input.GetAxisRaw("Horizontal") + Orientation.forward * Input.GetAxisRaw("Vertical");
+
+		Vector3 rbVelWithNoY = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+
+
+		if (move.normalized.magnitude != 0)
+		{
+			move = ((move.normalized * PlayerSpeed) - rbVelWithNoY) * PlayerAcceleration;
+
+			if (IsGrounded) move = Vector3.ProjectOnPlane(move, normal);
+
+			rb.AddForce(move, ForceMode.Force);
+		}
+		else
+		{
+			Vector3 deAcceleration = -rbVelWithNoY * PlayerDeacceleration;
+
+			if (IsGrounded) deAcceleration = Vector3.ProjectOnPlane(deAcceleration, normal);
+
+			rb.AddForce(deAcceleration, ForceMode.Force);
+		}
+	}
 
 	void HandleGravity()
 	{
