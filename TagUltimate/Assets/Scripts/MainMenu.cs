@@ -48,6 +48,9 @@ public class MainMenu : MonoBehaviourPunCallbacks
 	[Space]
 	public GameObject StartGameButton;
 
+	[Space]
+	public GameObject MapSelectionPanel;
+
 	#endregion
 
 	#region Awake
@@ -277,7 +280,12 @@ public class MainMenu : MonoBehaviourPunCallbacks
 		}
 
 		StartGameButton.SetActive(PhotonNetwork.IsMasterClient);
-		////mapSelectionPanel.SetActive(PhotonNetwork.IsMasterClient);
+		MapSelectionPanel.SetActive(PhotonNetwork.IsMasterClient);
+
+		if (PhotonNetwork.IsMasterClient)
+		{
+			MapManager.Current.SelectMap(1);
+		}
 
 	}
 	#endregion
@@ -317,6 +325,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
 		}
 
 		StartGameButton.SetActive(PhotonNetwork.IsMasterClient);
+		MapSelectionPanel.SetActive(PhotonNetwork.IsMasterClient);
 	}
 	#endregion
 
@@ -332,16 +341,16 @@ public class MainMenu : MonoBehaviourPunCallbacks
 			props.Add("team", 1);
 			PhotonNetwork.LocalPlayer.SetCustomProperties(props);
 
-			foreach (Transform child in playerListTeamB)
-			{
-				PlayerListItem pli = child.GetComponent<PlayerListItem>();
-				if (pli.player == PhotonNetwork.LocalPlayer)
-				{
-					Destroy(child.gameObject);
-				}
-			}
+			// foreach (Transform child in playerListTeamB)
+			// {
+			// 	PlayerListItem pli = child.GetComponent<PlayerListItem>();
+			// 	if (pli.player == PhotonNetwork.LocalPlayer)
+			// 	{
+			// 		Destroy(child.gameObject);
+			// 	}
+			// }
 
-			Instantiate(PlayerListItemPrefab, playerListTeamA).GetComponent<PlayerListItem>().SetUp(PhotonNetwork.LocalPlayer);
+			// Instantiate(PlayerListItemPrefab, playerListTeamA).GetComponent<PlayerListItem>().SetUp(PhotonNetwork.LocalPlayer);
 
 			Hashtable hashtable = new Hashtable();
 			hashtable.Add("Seekers", (int)PhotonNetwork.CurrentRoom.CustomProperties["Seekers"] - 1);
@@ -355,21 +364,21 @@ public class MainMenu : MonoBehaviourPunCallbacks
 			props.Add("team", 0);
 			PhotonNetwork.LocalPlayer.SetCustomProperties(props);
 
-			foreach (Transform child in playerListTeamA)
-			{
-				PlayerListItem pli = child.GetComponent<PlayerListItem>();
-				if (pli.player == PhotonNetwork.LocalPlayer)
-				{
-					Destroy(child.gameObject);
-				}
-			}
+			// foreach (Transform child in playerListTeamA)
+			// {
+			// 	PlayerListItem pli = child.GetComponent<PlayerListItem>();
+			// 	if (pli.player == PhotonNetwork.LocalPlayer)
+			// 	{
+			// 		Destroy(child.gameObject);
+			// 	}
+			// }
 
 			Hashtable hashtable = new Hashtable();
 			hashtable.Add("Seekers", (int)PhotonNetwork.CurrentRoom.CustomProperties["Seekers"] + 1);
 			hashtable.Add("Hiders", (int)PhotonNetwork.CurrentRoom.CustomProperties["Hiders"] - 1);
 			PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
 
-			Instantiate(PlayerListItemPrefab, playerListTeamB).GetComponent<PlayerListItem>().SetUp(PhotonNetwork.LocalPlayer);
+			// Instantiate(PlayerListItemPrefab, playerListTeamB).GetComponent<PlayerListItem>().SetUp(PhotonNetwork.LocalPlayer);
 		}
 	}
 	#endregion
@@ -461,6 +470,8 @@ public class MainMenu : MonoBehaviourPunCallbacks
 	public override void OnMasterClientSwitched(Player newMasterClient)
 	{
 		StartGameButton.SetActive(PhotonNetwork.IsMasterClient);
+		MapSelectionPanel.SetActive(PhotonNetwork.IsMasterClient);
+
 	}
 	#endregion
 
@@ -479,7 +490,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
 		//MenuManager.Instance.OpenMenu("loading");
 		Open(4);
 
-		PhotonNetwork.LoadLevel(1);
+		PhotonNetwork.LoadLevel(MapManager.Current.GetSelectedMap());
 	}
 	#endregion
 
