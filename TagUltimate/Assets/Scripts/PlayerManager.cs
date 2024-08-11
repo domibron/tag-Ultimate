@@ -8,6 +8,7 @@ using Photon.Pun.UtilityScripts;
 using Photon.Realtime;
 using TMPro;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
@@ -89,8 +90,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 			//    PhotonNetwork.NetworkingClient.OpSetCustomPropertiesOfRoom(hash);
 			//}
 
-			CreateController();
 			SetVaribles();
+			CreateController();
 
 			yield return new WaitForSeconds(0.5f);
 
@@ -104,6 +105,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 			}
 			SetVaribles();
 			matchTime = matchDuration;
+
+
+
 		}
 		else
 		{
@@ -124,6 +128,17 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 			seconds = matchTime % 60;
 			textHolder = $"{minutes}:{Mathf.RoundToInt(seconds)}"; // time left display - currently for mins and secs.
 		}
+
+		if (propertiesThatChanged.ContainsKey("Seekers"))
+		{
+			SeekerCount = (int)PhotonNetwork.CurrentRoom.CustomProperties["Seekers"];
+
+		}
+
+		if (propertiesThatChanged.ContainsKey("Hiders"))
+		{
+			HiderCount = (int)PhotonNetwork.CurrentRoom.CustomProperties["Hiders"];
+		}
 	}
 
 	void SetVaribles()
@@ -134,8 +149,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 		//maxKills = (int)PhotonNetwork.CurrentRoom.CustomProperties["MasterKills"];
 		matchTime = (float)PhotonNetwork.CurrentRoom.CustomProperties["MasterCT"]; // DO NOT REMOVE THIS - the time does not set to matchDuration.
 
-		SeekerCount = (int)PhotonNetwork.CurrentRoom.CustomProperties["Seekers"];
-		HiderCount = (int)PhotonNetwork.CurrentRoom.CustomProperties["Hiders"];
+
 
 		matchTime = matchDuration;
 
@@ -174,7 +188,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 			TopMidInfo.text = $"Time remaining: <mspace=30>{textHolder}</mspace>\nSeekers Remaining: {SeekerCount} | Hiders Remaining {HiderCount}";
 
 			// ==== end match logic ====
-			if (PhotonNetwork.IsMasterClient && matchTime <= 0 && PhotonNetwork.CurrentRoom.PlayerCount > 1)
+			if (PhotonNetwork.IsMasterClient && matchTime <= 0)//&& PhotonNetwork.CurrentRoom.PlayerCount > 1
 			{
 				// GameOver send RPC event
 				//Scoreboard.Instance.GetPlayerKills(Scoreboard.Instance.GetPlayerWithMostKills());
@@ -184,15 +198,15 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 				// handle kill count
 
 				//TODO can replace with win screen.
-				//ReturnToRoom();
-				ForceEveryoneToLeave();
+				ReturnToRoom();
+				// ForceEveryoneToLeave();
 			}
 
-			if (HiderCount <= 0 && PhotonNetwork.IsMasterClient && PhotonNetwork.CurrentRoom.PlayerCount > 1)
+			if (HiderCount <= 0 && PhotonNetwork.IsMasterClient)//&& PhotonNetwork.CurrentRoom.PlayerCount > 1
 			{
 				//TODO can replace with win screen.
-				//ReturnToRoom();
-				ForceEveryoneToLeave();
+				ReturnToRoom();
+				// ForceEveryoneToLeave();
 			}
 
 			// if (kills >= maxKills)
@@ -258,20 +272,20 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 	{
 		PhotonNetwork.Destroy(controller);
 
-
-		Hashtable hash = new Hashtable();
-		hash.Add("team", 0);
-		PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
-
 		if ((int)PV.Owner.CustomProperties["team"] == 1)
 		{
-			PV.RPC(nameof(ConverToSeeker), RpcTarget.MasterClient);
+			Hashtable hash = new Hashtable();
+			hash.Add("team", 0);
+			PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+
+
+			ConverToSeeker();
 		}
 
 		StartCoroutine(Respawn());
 	}
 
-	[PunRPC]
+
 	public void ConverToSeeker()
 	{
 		Hashtable hashtable = new Hashtable();
@@ -375,7 +389,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
 	public void ReturnToRoom()
 	{
-		PhotonNetwork.LoadLevel(0);
+		//PhotonNetwork.LoadLevel(0);
+
+		PV.RPC(nameof(RPC_ReturnToRoom), RpcTarget.All);
 	}
 
 	[PunRPC]
@@ -384,7 +400,27 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 		isGameOver = true;
 
 
+
 		StopCoroutine(Respawn());
+
+		Destroy(PlayerCharacter);
+
+		Destroy(RoomManager.Current.gameObject);
+
+
+
+		SceneManager.LoadScene(0);
+
+		StartCoroutine(DestroyWhenAtMainMenu());
+	}
+
+	IEnumerator DestroyWhenAtMainMenu()
+	{
+		while (SceneManager.GetActiveScene().buildIndex != 0)
+		{
+			yield return null;
+		}
+
 
 		Destroy(this.gameObject);
 	}
