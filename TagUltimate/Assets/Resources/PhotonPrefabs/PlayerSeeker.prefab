@@ -641,15 +641,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 5719997256596488470}
-  PlayerSpeed: 150
-  PlayerAcceleration: 0.05
+  PlayerSpeed: 160
+  PlayerAcceleration: 0.075
   PlayerDeacceleration: 0.1
   BoostForce: 15
   BoostCooldown: 5
   BoostImage: {fileID: 4973652848106739241}
   Orientation: {fileID: 7011810577891344373}
   IsGrounded: 0
-  GravityVector: {x: 0, y: -20, z: 0}
+  GravityVector: {x: 0, y: -28, z: 0}
   MaxHealth: 100
   CurrentHealth: 100
   PlayerManagerForPlayer: {fileID: 0}
