@@ -175,7 +175,7 @@ Transform:
   m_GameObject: {fileID: 3869176356894677472}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.023348212, z: 0.0052616596}
+  m_LocalPosition: {x: 0, y: 1, z: -3.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -546,7 +546,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6509053583000346139}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 1.5
   m_Drag: 0
   m_AngularDrag: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -719,7 +719,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxRange: 12
   RageMultForExplosion: 3
-  ExplosionForce: 50
+  ExplosionForce: 15
   CountDown: 2.5
   ExplosionCountDownImage: {fileID: 6604002893380783072}
 --- !u!1 &6851776405732297963
@@ -875,7 +875,7 @@ Transform:
   m_GameObject: {fileID: 9080905314089513006}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.023348212, z: 0.0052616596}
+  m_LocalPosition: {x: 0, y: 1, z: -3.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
