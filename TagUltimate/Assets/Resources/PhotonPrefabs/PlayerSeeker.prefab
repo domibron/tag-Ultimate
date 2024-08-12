@@ -175,7 +175,7 @@ Transform:
   m_GameObject: {fileID: 3869176356894677472}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -3.5}
+  m_LocalPosition: {x: 0, y: -0.023348212, z: 0.0052616596}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -674,9 +674,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 5719997256596488470}
   PlayerSpeed: 160
-  PlayerAcceleration: 0.075
-  PlayerDeacceleration: 0.1
-  BoostForce: 15
+  PlayerAcceleration: 0.12
+  PlayerDeacceleration: 0.12
+  BoostForce: 16
   BoostCooldown: 5
   BoostImage: {fileID: 4973652848106739241}
   Orientation: {fileID: 7011810577891344373}
@@ -686,8 +686,8 @@ MonoBehaviour:
   CurrentHealth: 100
   PlayerManagerForPlayer: {fileID: 0}
   HealthImage: {fileID: 0}
-  CollisionHitDamage: 10
-  MinSpeedToDamage: 5
+  CollisionHitDamage: 1
+  MinSpeedToDamage: 50
   PercentileDamageRange: 0.5
   PlayerBody: {fileID: 7745272950908195205}
 --- !u!114 &1909321901016143972
@@ -875,7 +875,7 @@ Transform:
   m_GameObject: {fileID: 9080905314089513006}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -3.5}
+  m_LocalPosition: {x: 0, y: -0.023348212, z: 0.0052616596}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
