@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon;
 using UnityEngine.UI;
 using Photon.Pun;
+using System.IO;
 
 public class PlayerMovement : MonoBehaviour, IDamageable
 {
@@ -178,6 +179,15 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 
 	public void Die() // function to call to kill player
 	{
+		if ((int)PV.Owner.CustomProperties["team"] == 0)
+		{
+			PlayerManagerForPlayer.SpawnObject(Path.Combine("PhotonPrefabs", "Player Death", "Seeker"), transform.position, transform.rotation);
+		}
+		else if ((int)PV.Owner.CustomProperties["team"] == 1)
+		{
+			PlayerManagerForPlayer.SpawnObject(Path.Combine("PhotonPrefabs", "Player Death", "Hider"), transform.position, transform.rotation);
+		}
+
 		PlayerManagerForPlayer.Die();
 	}
 
