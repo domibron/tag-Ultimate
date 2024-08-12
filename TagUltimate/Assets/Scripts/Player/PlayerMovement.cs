@@ -52,6 +52,8 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 
 	private Vector3 ballRightDir;
 
+	private bool isDead = false;
+
 	#endregion
 
 	#region Awake
@@ -116,7 +118,7 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 			HealthImage.fillAmount = CurrentHealth / MaxHealth;
 		}
 
-		if (CurrentHealth <= 0)
+		if (CurrentHealth <= 0 && !isDead)
 		{
 			Die();
 			//PlayerManager.Find(info.Sender).GetKill();
@@ -124,7 +126,7 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 
 		if (KillZone.Current == null) return;
 
-		if (transform.position.y <= KillZone.Current.YLevel)
+		if (transform.position.y <= KillZone.Current.YLevel && !isDead)
 		{
 			Die();
 		}
@@ -134,6 +136,8 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 	#region FixedUpdate
 	void FixedUpdate()
 	{
+		if (!PV.IsMine) return;
+
 		Vector3 move = Orientation.right * Input.GetAxisRaw("Horizontal") + Orientation.forward * Input.GetAxisRaw("Vertical");
 
 		Vector3 rbVelWithNoY = new Vector3(rb.velocity.x, 0, rb.velocity.z);
@@ -215,6 +219,9 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 	#region Die
 	public void Die() // function to call to kill player
 	{
+		if (isDead) return;
+		isDead = true;
+
 		if ((int)PV.Owner.CustomProperties["team"] == 0)
 		{
 			PlayerManagerForPlayer.SpawnObject(Path.Combine("PhotonPrefabs", "Player Death", "Seeker"), transform.position, transform.rotation);
