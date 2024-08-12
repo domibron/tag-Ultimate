@@ -40,6 +40,12 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 
 	public Image HealthImage;
 
+	public float CollisionHitDamage = 10f;
+
+	public float MinSpeedToDamage = 5f;
+
+	[Range(0, 1)]
+	public float PercentileDamageRange = 0.5f;
 
 	// Start is called before the first frame update
 	void Awake()
@@ -196,6 +202,31 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 		PV.RPC(nameof(RPC_AddExploForce), RpcTarget.Others, force, pos, range);
 
 		Die();
+	}
+
+	void OnCollisionEnter(Collision other)
+	{
+		if ((int)PV.Owner.CustomProperties["team"] == 1) return;
+
+		int team = -1;
+		if (other.gameObject.GetComponent<PhotonView>() != null)
+		{
+			team = (int)other.gameObject.GetComponent<PhotonView>().Owner.CustomProperties["team"];
+		}
+		else
+		{
+			return;
+		}
+
+		if (team == 0) return;
+
+
+		if (other.relativeVelocity.magnitude >= MinSpeedToDamage)
+		{
+			float percentDamage = other.relativeVelocity.magnitude / (PlayerSpeed - (PlayerSpeed * PercentileDamageRange));
+			other.gameObject.GetComponent<IDamageable>()?.TakeDamage(CollisionHitDamage * percentDamage);
+		}
+
 	}
 
 	[PunRPC]
