@@ -15,6 +15,7 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class PlayerManager : MonoBehaviourPunCallbacks
 {
+	#region Variables
 	// [SerializeField] GameObject panel;
 	// [SerializeField] TMP_Text text;
 	// [SerializeField] Canvas canvas;
@@ -52,11 +53,16 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 	private int SeekerCount = 0;
 	private int HiderCount = 0;
 
+	#endregion
+
+	#region Awake
 	void Awake()
 	{
 		PV = GetComponent<PhotonView>();
 	}
+	#endregion
 
+	#region Start
 	IEnumerator Start()
 	{
 		// panel.SetActive(false);
@@ -115,7 +121,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 			//Destroy(panel);
 		}
 	}
+	#endregion
 
+	#region OnRoomPropertiesUpdate
 	public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
 	{
 		if (!ranPrimary)
@@ -124,9 +132,10 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 		{
 			matchTime = (float)PhotonNetwork.CurrentRoom.CustomProperties["MasterCT"];
 
-			minutes = Mathf.Floor(matchTime / 60);
-			seconds = matchTime % 60;
-			textHolder = $"{minutes}:{Mathf.RoundToInt(seconds)}"; // time left display - currently for mins and secs.
+			// ! moved
+			// minutes = Mathf.Floor(matchTime / 60);
+			// seconds = matchTime % 60;
+			// textHolder = $"{minutes}:{Mathf.RoundToInt(seconds)}"; // time left display - currently for mins and secs.
 		}
 
 		if (propertiesThatChanged.ContainsKey("Seekers"))
@@ -140,7 +149,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 			HiderCount = (int)PhotonNetwork.CurrentRoom.CustomProperties["Hiders"];
 		}
 	}
+	#endregion
 
+	#region SetVaribles
 	void SetVaribles()
 	{
 		ranPrimary = true;
@@ -157,26 +168,36 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 		//print(maxKills);
 		//print(matchDuration);
 	}
+	#endregion
 
+	#region Update
 	void Update()
 	{
 
 		if (PV.IsMine)
 		{
-
+			matchTime -= Time.deltaTime;
 			if (!isGameOver && PhotonNetwork.IsMasterClient) // change the time - yes i need to point this out.
 			{
-				matchTime -= Time.deltaTime;
+				// matchTime -= Time.deltaTime;
 				PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable() { { "MasterCT", matchTime } }); // set the global value
 
-				minutes = Mathf.Floor(matchTime / 60);
-				seconds = matchTime % 60;
-				textHolder = $"{minutes}:{Mathf.RoundToInt(seconds)}";
+				// minutes = Mathf.Floor(matchTime / 60);
+				// seconds = matchTime % 60;
+				// textHolder = $"{minutes}:{Mathf.RoundToInt(seconds)}";
 			}
 			else if (!isGameOver)
 			{
-				matchTime = (float)PhotonNetwork.CurrentRoom.CustomProperties["MasterCT"]; // syncing off hosts.
+				//matchTime = (float)PhotonNetwork.CurrentRoom.CustomProperties["MasterCT"]; // syncing off hosts.
+
+				// minutes = Mathf.Floor(matchTime / 60);
+				// seconds = matchTime % 60;
+				// textHolder = $"{minutes}:{Mathf.RoundToInt(seconds)}"; // time left display - currently for mins and secs.
 			}
+
+			minutes = Mathf.Floor(matchTime / 60);
+			seconds = matchTime % 60;
+			textHolder = $"{minutes}:{Mathf.RoundToInt(seconds)}";
 
 
 			//float timeHolder = matchTime / 60f; // match time is getting set faster and before this update is called so temp is here to help with that.
@@ -223,7 +244,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 		// 	text.text = $"<b>You Died lol!</b><br>Respawning in:<br><mspace=0.75em>{(Mathf.Round(timeLeft * 100f) / 100f).ToString("N2")}</mspace>";
 		// }
 	}
+	#endregion
 
+	#region CreateController
 	void CreateController()
 	{
 		Transform spawnpoint = null;
@@ -244,7 +267,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 		// respawn point change to respected team.
 
 	}
+	#endregion
 
+	#region Respawn
 	IEnumerator Respawn()
 	{
 		//panel.SetActive(true);
@@ -267,7 +292,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 			Cursor.lockState = CursorLockMode.Confined;
 		}
 	}
+	#endregion
 
+	#region Die
 	public void Die()
 	{
 		PhotonNetwork.Destroy(controller);
@@ -284,8 +311,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
 		StartCoroutine(Respawn());
 	}
+	#endregion
 
-
+	#region ConverToSeeker
 	public void ConverToSeeker()
 	{
 		Hashtable hashtable = new Hashtable();
@@ -298,12 +326,16 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
 
 	}
+	#endregion
 
+	#region GetKill
 	public void GetKill()
 	{
 		PV.RPC(nameof(RPC_GetKill), PV.Owner);
 	}
+	#endregion
 
+	#region RPC_ChangeHiders
 	[PunRPC]
 	void RPC_ChangeHiders(int ammount)
 	{
@@ -314,7 +346,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
 		PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
 	}
+	#endregion
 
+	#region RPC_ChangeSeekers
 	[PunRPC]
 	void RPC_ChangeSeekers(int ammount)
 	{
@@ -324,8 +358,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
 		PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
 	}
+	#endregion
 
-
+	#region RPC_GetKill
 	[PunRPC]
 	void RPC_GetKill()
 	{
@@ -335,14 +370,17 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 		//hash.Add("kills", kills);
 		//PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
 	}
+	#endregion
 
+	#region Find
 	public static PlayerManager Find(Player player)
 	{
 		return FindObjectsByType<PlayerManager>(FindObjectsSortMode.None).SingleOrDefault(x => x.PV.Owner == player);
 	}
+	#endregion
 
-	// ====================== eeee
 
+	#region RPC_SendWinner
 	[PunRPC]
 	void RPC_SendWinner(Player winnerPlayer, int kills)
 	{
@@ -372,28 +410,34 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
 		// need to do this
 	}
+	#endregion
 
+	#region SpawnObject
 	public void SpawnObject(string path, Vector3 pos, Quaternion rotaton)
 	{
 		PV.RPC(nameof(RPC_SpawnObject), RpcTarget.All, path, pos, rotaton);
 	}
+	#endregion
 
-
+	#region RPC_SpawnObject
 	[PunRPC]
 	void RPC_SpawnObject(String path, Vector3 pos, Quaternion rotaton)
 	{
 		Instantiate(Resources.Load(path), pos, rotaton);
 	}
+	#endregion
 
 	// ====================== leave room management ======================
-
+	#region ReturnToRoom
 	public void ReturnToRoom()
 	{
 		//PhotonNetwork.LoadLevel(0);
 
 		PV.RPC(nameof(RPC_ReturnToRoom), RpcTarget.All);
 	}
+	#endregion
 
+	#region RPC_ReturnToRoom
 	[PunRPC]
 	public void RPC_ReturnToRoom()
 	{
@@ -413,7 +457,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
 		StartCoroutine(DestroyWhenAtMainMenu());
 	}
+	#endregion
 
+	#region DestroyWhenAtMainMenu
 	IEnumerator DestroyWhenAtMainMenu()
 	{
 		while (SceneManager.GetActiveScene().buildIndex != 0)
@@ -424,18 +470,24 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
 		Destroy(this.gameObject);
 	}
+	#endregion
 
+	#region ForceEveryoneToLeave
 	public void ForceEveryoneToLeave()
 	{
 		PV.RPC(nameof(RPC_DisconnectEveryoneAndHost), RpcTarget.All);
 	}
+	#endregion
 
+	#region RPC_DisconnectEveryoneAndHost
 	[PunRPC]
 	void RPC_DisconnectEveryoneAndHost()
 	{
 		leaveRoom();
 	}
+	#endregion
 
+	#region leaveRoom
 	public void leaveRoom()
 	{
 		if ((int)PhotonNetwork.LocalPlayer.CustomProperties["team"] == 0)
@@ -455,7 +507,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
 		StartCoroutine(DisconnectAndLoad());
 	}
+	#endregion
 
+	#region DisconnectAndLoad
 	IEnumerator DisconnectAndLoad()
 	{
 		//PhotonNetwork.Disconnect();
@@ -465,4 +519,5 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 			yield return null;
 		SceneManager.LoadScene(0);
 	}
+	#endregion
 }

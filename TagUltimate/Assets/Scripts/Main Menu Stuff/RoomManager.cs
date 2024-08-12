@@ -12,7 +12,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
 	bool active;
 
 	// extarnlly set vars
-
+	#region Awake
 	void Awake()
 	{
 		if (Current != null && Current != this)
@@ -25,18 +25,24 @@ public class RoomManager : MonoBehaviourPunCallbacks
 			DontDestroyOnLoad(this);
 		}
 	}
+	#endregion
 
+	#region OnEnable
 	public override void OnEnable()
 	{
 		base.OnEnable();
 		SceneManager.sceneLoaded += OnSceneLoaded;
 	}
+	#endregion
 
+	#region OnDisable
 	public override void OnDisable()
 	{
 		SceneManager.sceneLoaded -= OnSceneLoaded;
 	}
+	#endregion
 
+	#region OnSceneLoaded
 	void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
 	{
 		// make a swich statement.
@@ -48,11 +54,14 @@ public class RoomManager : MonoBehaviourPunCallbacks
 			InstaciatePlayerManager();
 		}
 	}
+	#endregion
 
+	#region InstaciatePlayerManager
 	void InstaciatePlayerManager()
 	{
 		GameObject playerRe = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerManager"), Vector3.zero, Quaternion.identity); // create function
 		PlayerManager playerManager = playerRe.GetComponent<PlayerManager>();
 		//playerManager.gaw = 69; // set sensitivity and such
 	}
+	#endregion
 }
