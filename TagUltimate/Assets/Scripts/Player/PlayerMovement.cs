@@ -8,6 +8,7 @@ using System.IO;
 
 public class PlayerMovement : MonoBehaviour, IDamageable
 {
+	#region Variables
 	public Rigidbody rb;
 
 	public float PlayerSpeed = 2f;
@@ -47,6 +48,13 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 	[Range(0, 1)]
 	public float PercentileDamageRange = 0.5f;
 
+	public Transform PlayerBody;
+
+	private Vector3 ballRightDir;
+
+	#endregion
+
+	#region Awake
 	// Start is called before the first frame update
 	void Awake()
 	{
@@ -58,7 +66,9 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 
 		PlayerManagerForPlayer = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<PlayerManager>();
 	}
+	#endregion
 
+	#region Start
 	void Start()
 	{
 		if (!PV.IsMine) return;
@@ -68,10 +78,18 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 		//if ((int)PV.Owner.CustomProperties["team"] == 0) HealthImage.gameObject.SetActive(false);
 		if ((int)PV.Owner.CustomProperties["team"] == 1) HealthImage.gameObject.SetActive(true);
 	}
+	#endregion
 
-
+	#region Update
 	void Update()
 	{
+
+		Vector3 ballDir = rb.velocity.normalized;
+		ballRightDir = Vector3.Cross(Vector3.up, ballDir);
+
+		float dist = rb.velocity.magnitude * Time.fixedDeltaTime;
+		float alpha = (dist * 180.0f) / (Mathf.PI * 0.37f);
+		PlayerBody.Rotate(ballRightDir, alpha, Space.World);
 
 		if (!PV.IsMine) return;
 
@@ -111,7 +129,9 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 			Die();
 		}
 	}
+	#endregion
 
+	#region FixedUpdate
 	void FixedUpdate()
 	{
 		Vector3 move = Orientation.right * Input.GetAxisRaw("Horizontal") + Orientation.forward * Input.GetAxisRaw("Vertical");
@@ -136,7 +156,9 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 			rb.AddForce(deAcceleration, ForceMode.Force);
 		}
 	}
+	#endregion
 
+	#region HandleGravity
 	void HandleGravity()
 	{
 		if (rb.useGravity) return;
@@ -145,7 +167,9 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 
 		else if (rb.velocity.y >= GravityVector.y) rb.AddForce(GravityVector, ForceMode.Force);
 	}
+	#endregion
 
+	#region HandleGroundCheck
 	void HandleGroundCheck()
 	{
 		if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 1.2f))
@@ -161,12 +185,16 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 
 		}
 	}
+	#endregion
 
+	#region TakeDamage
 	public void TakeDamage(float damage)
 	{
 		PV.RPC(nameof(RPC_TakeDamage), PV.Owner, damage);
 	}
+	#endregion
 
+	#region RPC_TakeDamage
 	[PunRPC]
 	void RPC_TakeDamage(float damage, PhotonMessageInfo info)
 	{
@@ -182,7 +210,9 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 			//PlayerManager.Find(info.Sender).GetKill();
 		}
 	}
+	#endregion
 
+	#region Die
 	public void Die() // function to call to kill player
 	{
 		if ((int)PV.Owner.CustomProperties["team"] == 0)
@@ -196,14 +226,18 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 
 		PlayerManagerForPlayer.Die();
 	}
+	#endregion
 
+	#region Expload
 	public void Expload(float force, Vector3 pos, float range)
 	{
 		PV.RPC(nameof(RPC_AddExploForce), RpcTarget.Others, force, pos, range);
 
 		Die();
 	}
+	#endregion
 
+	#region OnCollisionEnter
 	void OnCollisionEnter(Collision other)
 	{
 		if ((int)PV.Owner.CustomProperties["team"] == 1) return;
@@ -228,23 +262,30 @@ public class PlayerMovement : MonoBehaviour, IDamageable
 		}
 
 	}
+	#endregion
 
+	#region RPC_AddExploForce
 	[PunRPC]
 	void RPC_AddExploForce(float force, Vector3 pos, float range)
 	{
 		rb.AddExplosionForce(force, pos, range);
 	}
+	#endregion
 
+	#region AddForce
 	public void AddForce(Vector3 force, ForceMode forceMode = ForceMode.Force)
 	{
 		PV.RPC(nameof(RPC_AddForce), PV.Owner, force, forceMode);
 	}
+	#endregion
 
+	#region RPC_AddForce
 	[PunRPC]
 	void RPC_AddForce(Vector3 force, ForceMode forceMode)
 	{
 		rb.AddForce(force, forceMode);
 	}
+	#endregion
 }
 
 
