@@ -313,8 +313,16 @@ public class MainMenu : MonoBehaviourPunCallbacks
 			Destroy(child.gameObject);
 		}
 
+
+
+
 		if (PhotonNetwork.IsMasterClient)
 		{
+			Hashtable hashtable = new Hashtable();
+			hashtable.Add("Hiders", 0);
+			hashtable.Add("Seeker", 0);
+			PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+
 
 			int alt = 0;
 			for (int i = 0; i < players.Length; i++)
@@ -329,10 +337,16 @@ public class MainMenu : MonoBehaviourPunCallbacks
 				if ((int)players[i].CustomProperties["team"] == 0)
 				{
 					Instantiate(PlayerListItemPrefab, playerListTeamA).GetComponent<PlayerListItem>().SetUp(players[i]);
+					hashtable = new Hashtable();
+					hashtable.Add("Seekers", (int)PhotonNetwork.CurrentRoom.CustomProperties["Seekers"] + 1);
+					PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
 				}
 				else
 				{
 					Instantiate(PlayerListItemPrefab, playerListTeamB).GetComponent<PlayerListItem>().SetUp(players[i]);
+					hashtable = new Hashtable();
+					hashtable.Add("Hiders", (int)PhotonNetwork.CurrentRoom.CustomProperties["Hiders"] + 1);
+					PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
 				}
 			}
 		}
