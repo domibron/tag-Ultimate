@@ -24,7 +24,7 @@ public class Pingger : MonoBehaviour
 		{
 			Vector3 vector = other.transform.position - transform.position;
 
-			other.gameObject.GetComponent<Rigidbody>().AddForce(vector.normalized * Force);
+			other.gameObject.GetComponent<Rigidbody>().AddForce(vector.normalized * Force, ForceMode.Impulse);
 		}
 	}
 }
