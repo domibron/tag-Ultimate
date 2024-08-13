@@ -7,6 +7,7 @@ using TMPro;
 using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using System;
+using System.Linq;
 
 public class MainMenu : MonoBehaviourPunCallbacks
 {
@@ -50,6 +51,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
 
 	[Space]
 	public GameObject MapSelectionPanel;
+	public GameObject MapDisplayForClients;
 
 	#endregion
 
@@ -187,6 +189,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
 		RoomCustomProps.Add("MasterCT", float1 * 60f);
 		RoomCustomProps.Add("Seekers", 0);
 		RoomCustomProps.Add("Hiders", 0);
+		RoomCustomProps.Add("SceneIndex", 1);
 		//RoomCustomProps.Add("Version", Application.version);
 		roomOptions.CustomRoomProperties = RoomCustomProps;
 		// https://youtu.be/aVUNiJ3MVSg
@@ -281,6 +284,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
 
 		StartGameButton.SetActive(PhotonNetwork.IsMasterClient);
 		MapSelectionPanel.SetActive(PhotonNetwork.IsMasterClient);
+		MapDisplayForClients.SetActive(!PhotonNetwork.IsMasterClient);
 
 		if (PhotonNetwork.IsMasterClient)
 		{
@@ -353,6 +357,8 @@ public class MainMenu : MonoBehaviourPunCallbacks
 
 		StartGameButton.SetActive(PhotonNetwork.IsMasterClient);
 		MapSelectionPanel.SetActive(PhotonNetwork.IsMasterClient);
+		MapDisplayForClients.SetActive(!PhotonNetwork.IsMasterClient);
+
 
 		if (PhotonNetwork.IsMasterClient)
 		{
@@ -538,6 +544,8 @@ public class MainMenu : MonoBehaviourPunCallbacks
 	{
 		StartGameButton.SetActive(PhotonNetwork.IsMasterClient);
 		MapSelectionPanel.SetActive(PhotonNetwork.IsMasterClient);
+		MapDisplayForClients.SetActive(!PhotonNetwork.IsMasterClient);
+
 
 	}
 	#endregion
@@ -628,6 +636,17 @@ public class MainMenu : MonoBehaviourPunCallbacks
 
 
 		Open(0);
+	}
+	#endregion
+
+	#region OnRoomPropertiesUpdate
+	public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
+	{
+		if (propertiesThatChanged.Keys.Contains("SceneIndex") && !PhotonNetwork.IsMasterClient)
+		{
+			MapDisplayForClients.GetComponent<Image>().sprite = MapManager.Current.GetMapImage();
+			MapDisplayForClients.GetComponent<Image>().color = MapManager.Current.GetMapColour();
+		}
 	}
 	#endregion
 
