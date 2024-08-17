@@ -512,8 +512,8 @@ MonoBehaviour:
     m_OverlaysVisible: 1
   m_SceneHierarchy:
     m_TreeViewState:
-      scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 
+      scrollPos: {x: 0, y: 2560.4}
+      m_SelectedIDs: 3e0b0200
       m_LastClickedID: 0
       m_ExpandedIDs: 24adc2ffa8adc2ff82e0c2ff76e5c2ffaae5c2ffb8e7c2ff3cebc2ff3eebc2ffa2edc2ffe63bc3ff1a3cc3ffd2fbc3ff7005c4ff649bc4ff2088caffd032cbffb88bffffa2f2ffff02fbffffa091000032970000ba980000c8980000f4990000
       m_RenameOverlay:
@@ -1453,9 +1453,9 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 688
-    width: 1554
-    height: 311
+    y: 563.2
+    width: 1209.4
+    height: 260.19998
   m_SerializedDataModeController:
     m_DataMode: 0
     m_PreferredDataMode: 0
@@ -1586,12 +1586,12 @@ MonoBehaviour:
       oldMaxSizes: 
       oldSplitSize: 0
     m_HorizontalSplitter:
-      ID: 36911
+      ID: 7982
       splitterInitialOffset: 0
       currentActiveSplitter: -1
       realSizes:
-      - 466
-      - 1088
+      - 363.19995
+      - 846.4
       relativeSizes:
       - 0.3
       - 0.7
@@ -1601,7 +1601,7 @@ MonoBehaviour:
       maxSizes:
       - 0
       - 0
-      lastTotalSize: 1554
+      lastTotalSize: 1209.6
       splitSize: 6
       xOffset: 0
       m_Version: 1
