@@ -1,14 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class MapManager : MonoBehaviour
 {
 	public static MapManager Current;
 
-	[SerializeField] Map[] maps;
+	public Map[] maps;
 
 	private Scene currentPrepedScene;
 
@@ -52,6 +54,16 @@ public class MapManager : MonoBehaviour
 		return currentMapNumber;
 	}
 
+	public Sprite GetMapImage()
+	{
+		return SelectedMap.MapImage.sprite;
+	}
+
+	public Color GetMapColour()
+	{
+		return SelectedMap.MapImage.color;
+	}
+
 	public void SelectMap(Map map)
 	{
 		SelectMap(map.mapIndexNumber);
@@ -84,6 +96,8 @@ public class MapManager : MonoBehaviour
 				DeSelectMap(maps[i]);
 			}
 		}
+
+		if (PhotonNetwork.InRoom) PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable() { { "SceneIndex", mapBuildIndexNumber } });
 
 	}
 
